@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a9183492-4f27-448e-bdf1-project-task-api",
     "name": "Project & Task Management API",
-    "description": "Comprehensive Postman collection for testing the Project & Task Management RESTful API with MySQL and MongoDB.",
+    "description": "Comprehensive Postman collection with automated test assertions for testing the Project & Task Management RESTful API with MySQL (Docker) and MongoDB.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -29,6 +29,40 @@
   ],
   "item": [
     {
+      "name": "0. Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('API is healthy and running', () => {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "1. Authentication",
       "item": [
         {
@@ -38,9 +72,19 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
                   "const jsonData = pm.response.json();",
+                  "pm.test('Returns JWT token and user info', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.token).to.be.a('string');",
+                  "    pm.expect(jsonData.data.user.email).to.be.a('string');",
+                  "    pm.expect(jsonData.data.user.password).to.be.undefined;",
+                  "});",
                   "if (jsonData.data && jsonData.data.token) {",
                   "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "    if (pm.environment) pm.environment.set('token', jsonData.data.token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -73,9 +117,17 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   "const jsonData = pm.response.json();",
+                  "pm.test('Login returns valid token', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.token).to.be.a('string');",
+                  "});",
                   "if (jsonData.data && jsonData.data.token) {",
                   "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "    if (pm.environment) pm.environment.set('token', jsonData.data.token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -103,6 +155,24 @@
         },
         {
           "name": "Get Profile (Me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('User profile returned correctly', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.user.id).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -120,6 +190,24 @@
         },
         {
           "name": "Update Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('User name updated', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.user.name).to.eql('Jane Lead Architect');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -155,9 +243,17 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
                   "const jsonData = pm.response.json();",
+                  "pm.test('Project created with ID', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.project.id).to.be.a('number');",
+                  "});",
                   "if (jsonData.data && jsonData.data.project) {",
-                  "    pm.collectionVariables.set('projectId', jsonData.data.project.id);",
+                  "    pm.collectionVariables.set('projectId', jsonData.data.project.id.toString());",
+                  "    if (pm.environment) pm.environment.set('projectId', jsonData.data.project.id.toString());",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -189,6 +285,24 @@
         },
         {
           "name": "Get All Projects",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Projects list returned', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.projects).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -206,6 +320,24 @@
         },
         {
           "name": "Get Project by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Single project returned', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.project.id.toString()).to.eql(pm.collectionVariables.get('projectId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -223,6 +355,24 @@
         },
         {
           "name": "Update Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Project updated', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.project.status).to.eql('completed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -248,6 +398,24 @@
         },
         {
           "name": "Delete Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Project deleted', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.deleted).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [
@@ -275,9 +443,17 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test('Status code is 201', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
                   "const jsonData = pm.response.json();",
+                  "pm.test('Task created with Mongo ID', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.task.id).to.be.a('string');",
+                  "});",
                   "if (jsonData.data && jsonData.data.task) {",
                   "    pm.collectionVariables.set('taskId', jsonData.data.task.id);",
+                  "    if (pm.environment) pm.environment.set('taskId', jsonData.data.task.id);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -309,6 +485,27 @@
         },
         {
           "name": "Get Tasks (Paginated & Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Pagination metadata present', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.pagination).to.have.property('totalRecords');",
+                  "    pm.expect(jsonData.pagination).to.have.property('totalPages');",
+                  "    pm.expect(jsonData.pagination).to.have.property('currentPage');",
+                  "    pm.expect(jsonData.pagination).to.have.property('limit');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -332,6 +529,24 @@
         },
         {
           "name": "Get Task by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Single task returned', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.task.id).to.eql(pm.collectionVariables.get('taskId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -349,6 +564,24 @@
         },
         {
           "name": "Update Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Task updated', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.task.status).to.eql('in_progress');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -374,6 +607,24 @@
         },
         {
           "name": "Delete Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('Task deleted', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data.deleted).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [
@@ -396,6 +647,30 @@
       "item": [
         {
           "name": "Get Dashboard Statistics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "pm.test('All dashboard metrics present', () => {",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.data).to.have.property('totalProjects');",
+                  "    pm.expect(jsonData.data).to.have.property('activeProjects');",
+                  "    pm.expect(jsonData.data).to.have.property('completedProjects');",
+                  "    pm.expect(jsonData.data).to.have.property('totalTasks');",
+                  "    pm.expect(jsonData.data).to.have.property('pendingTasks');",
+                  "    pm.expect(jsonData.data).to.have.property('completedTasks');",
+                  "    pm.expect(jsonData.data).to.have.property('highPriorityTasks');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
