@@ -6,7 +6,7 @@ A production-ready, highly secure RESTful API built with **Node.js**, **Express*
 
 ## 🌟 Technologies & Architecture
 
-- **Runtime & Modules**: Node.js (v20+ / v22+), ES Modules (`"type": "module"`)
+- **Runtime & Modules**: Node.js (v20+ / v22+), 
 - **Web Framework**: Express.js with Helmet security headers, CORS, and Morgan logging
 - **Relational Database (MySQL 8.0 in Docker)**:
   - Managed via **Sequelize ORM**
