@@ -1,0 +1,135 @@
+### Variables
+@baseUrl = http://localhost:5000/api
+@token = YOUR_JWT_TOKEN_HERE
+@projectId = 1
+@taskId = YOUR_MONGO_TASK_ID_HERE
+
+### ==============================================================================
+### 1. HEALTH CHECK
+### ==============================================================================
+
+### Check API Health
+GET {{baseUrl}}/health
+
+### ==============================================================================
+### 2. AUTHENTICATION & PROFILE
+### ==============================================================================
+
+### Register User
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "password": "Password123"
+}
+
+### Login User
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "password": "Password123"
+}
+
+### Get Authenticated User Profile (Me)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### Update Profile
+PUT {{baseUrl}}/auth/profile
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Jane Doe, Lead Engineer",
+  "password": "NewSecurePassword123"
+}
+
+### ==============================================================================
+### 3. PROJECT MANAGEMENT (MySQL)
+### ==============================================================================
+
+### Create Project
+POST {{baseUrl}}/projects
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cloud Platform Infrastructure",
+  "description": "Kubernetes migration and database setup",
+  "status": "active"
+}
+
+### Get All Projects
+GET {{baseUrl}}/projects
+Authorization: Bearer {{token}}
+
+### Get Project By ID
+GET {{baseUrl}}/projects/{{projectId}}
+Authorization: Bearer {{token}}
+
+### Update Project
+PUT {{baseUrl}}/projects/{{projectId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Cloud Platform Infrastructure - Phase 2",
+  "status": "completed"
+}
+
+### Delete Project
+DELETE {{baseUrl}}/projects/{{projectId}}
+Authorization: Bearer {{token}}
+
+### ==============================================================================
+### 4. TASK MANAGEMENT (MongoDB)
+### ==============================================================================
+
+### Create Task
+POST {{baseUrl}}/tasks
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Setup Docker Compose & Network",
+  "description": "Configure MySQL on port 3307 and connect to MongoDB",
+  "status": "todo",
+  "priority": "high",
+  "projectId": {{projectId}},
+  "dueDate": "2026-11-15T00:00:00.000Z"
+}
+
+### Get All Tasks (with Pagination and Filters)
+GET {{baseUrl}}/tasks?page=1&limit=10&status=todo&priority=high&projectId={{projectId}}
+Authorization: Bearer {{token}}
+
+### Get Task By ID
+GET {{baseUrl}}/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+
+### Update Task
+PUT {{baseUrl}}/tasks/{{taskId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Setup Docker Compose & Network (Completed)",
+  "status": "completed",
+  "priority": "high"
+}
+
+### Delete Task
+DELETE {{baseUrl}}/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+
+### ==============================================================================
+### 5. DASHBOARD STATISTICS
+### ==============================================================================
+
+### Get Dashboard Statistics
+GET {{baseUrl}}/dashboard
+Authorization: Bearer {{token}}
